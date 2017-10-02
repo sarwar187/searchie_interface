@@ -2,6 +2,7 @@
 var rootURL = "http://localhost:8181/searchie_interface/rest/api";
 
 // Retrieve paragraph when application starts
+//application start howar shathe shathe paragraph dekhailo. showParagraph() er definition ta niche likha ase. 
 showParagraph();
 
 // -------------------------------
@@ -24,6 +25,8 @@ document.getElementById("query").addEventListener("click", function () {
   searchQuery();
 });
 
+//showParagraph() function ta successful hoile renderList() function ke call dibe. rootURL a showParagraph() function
+//ta ase, ebong oitar against a GET method ta ase. so type hoilo GET and dataType hoilo json. 
 function showParagraph() {
 	console.log('showParagraph');
 	$.ajax({
@@ -59,6 +62,11 @@ function renderList(data) {
 		$('.clickable').append(paragraph.description);
 		$('.clickable').lettering('words');
 	});
+//	$.each(list, function(index, paragraph) {
+//		$.append(paragraph.description);
+//		$.lettering('words');
+//	});
+	
 }
 
 // Helper function to serialize all the form fields into a JSON string

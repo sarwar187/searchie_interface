@@ -12,7 +12,8 @@ public class Service {
 		String description = "Suppose you are reading a sentence like one below\n";
 		description+="Carolyn and her twin sisters , Lauren and Lisa , were raised by their mother , Ann Freeman , a teacher and administrator in the New York public schools , and their stepfather , orthopedic surgeon Richard Freeman .\r\n";
 		description+= "Now assume that you are interested in an entity 'Riachard Freeman' mentioned in the sentence. Richard Freeman is a familiy member(father) of Carolyn, and you want to find other family members. Which keywords from the sentence best describes your information need? Assume that " + 
-		"these words will be sent to a keyword-based search engine";		
+		"these words will be sent to a keyword-based search engine";
+		para.setDescription(description);
 		return para;
 	}
 	
