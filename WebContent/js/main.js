@@ -1,5 +1,5 @@
 // The root URL for the RESTful services
-var rootURL = "http://localhost:8080/sar/rest/api";
+var rootURL = "http://localhost:8181/searchie_interface/rest/api";
 
 // Retrieve paragraph when application starts
 showParagraph();
