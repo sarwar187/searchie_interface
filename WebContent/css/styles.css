@@ -1,0 +1,38 @@
+.content_area {
+	position: absolute;
+	left: 10px;
+	top: 70px;
+	bottom: 20px;
+	width: 260px;
+	border: solid 1px #CCCCCC;
+	overflow-y: scroll;
+}
+
+.search_area {
+	position: absolute;
+	top: 70px;
+	bottom: 20px;
+	left: 300px;
+	overflow-y: scroll;
+	width: 300px;
+}
+
+.paragraph_form {
+	position: absolute;
+	top: 70px;
+	bottom: 20px;
+	left: 650px;
+	overflow-y: scroll;
+	width: 270px;
+}
+
+.li_visited {
+	background-color: red;
+	color: white;
+}
+
+.clickable span:hover {
+    font-weight:bold;
+}
+
+span.hl { background: yellow; }
