@@ -8,17 +8,37 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Paragraph {
 
-    private int id;
+    private String id;
 
     private String title;
 
     private String description;
+    
+    private String instructions; 
+    
+    private String context_words;
+    
+    public String getContext_words() {
+		return context_words;
+	}
 
-	public int getId() {
+	public void setContext_words(String context_words) {
+		this.context_words = context_words;
+	}
+
+	public String getInstructions() {
+		return instructions;
+	}
+
+	public void setInstructions(String instructions) {
+		this.instructions = instructions;
+	}
+
+	public String getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -37,5 +57,8 @@ public class Paragraph {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
+	
+	public String toString(){
+		return this.getId() + "\t" + this.getDescription() + "\t" + this.getTitle() + "\t" + this.getInstructions();
+	}
 }

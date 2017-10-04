@@ -1,6 +1,11 @@
 // The root URL for the RESTful services
-var rootURL = "http://localhost:8181/searchie_interface/rest/api";
-
+//var rootURL = "http://localhost:8181/searchie_interface/rest/api";
+//var rootURL = "http://localhost:8080/searchie_interface/rest/api";
+//var rootURL = "https://aybpwofuza.localtunnel.me/searchie_interface/rest/api";
+//var rootURL = "http://brooloo.cs.umass.edu:8080/searchie_interface/rest/api"
+//var rootURL = "http://localhost:8181/searchie_interface/rest/api"
+var rootURL = "http://brooloo.cs.umass.edu:8080/searchie_interface/rest/api"
+//var rootURL = "http://brooloo.cs.umass.edu:8080/searchie_interface/rest/api"
 // Retrieve paragraph when application starts
 //application start howar shathe shathe paragraph dekhailo. showParagraph() er definition ta niche likha ase. 
 showParagraph();
@@ -37,6 +42,7 @@ function showParagraph() {
 	});
 }
 
+
 function searchQuery() {
 	console.log('searchQuery');
 	$.ajax({
@@ -46,7 +52,7 @@ function searchQuery() {
 		dataType : "json",
 		data : prepareQuery(),
 		success : function(data, textStatus, jqXHR) {
-			alert('Query executed successfully');
+			alert('Query Sent to Server successfully');
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
 			alert('Query error: ' + textStatus);
@@ -54,11 +60,21 @@ function searchQuery() {
 	});
 }
 
+var paragraph_id;
+var paragraph_title;
+
 function renderList(data) {
 	// JAX-RS serializes an empty list as null, and a 'collection of one' as an
 	// object (not an 'array of one')
 	var list = data == null ? [] : (data instanceof Array ? data : [ data ]);
 	$.each(list, function(index, paragraph) {
+		paragraph_id = paragraph.id
+		paragraph_title = paragraph.title
+//		$('.normal').append(paragraph_id);
+//		$('.normal').append(paragraph_title);	
+//		alert("query params: [" + paragraph.title + "]");
+		$('.normal').append(paragraph.instructions);
+		$('.normal').lettering('words');
 		$('.clickable').append(paragraph.description);
 		$('.clickable').lettering('words');
 	});
@@ -71,10 +87,12 @@ function renderList(data) {
 
 // Helper function to serialize all the form fields into a JSON string
 function prepareQuery() {
-	var selections = [];
+	var selections = [paragraph_id];
 	$(".tagit-label").each(function() { selections.push($(this).text()) });
+	//selections.push(String(paragraph.id));
+	//selections.push(String(paragraph.title));	
 	var json_data = JSON.stringify({
-		"param": selections.join("<$@4M@4>")
+		"param": selections.join("\t")
 	});
 	alert("query params: [" + json_data + "]");
 	

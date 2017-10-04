@@ -1,5 +1,8 @@
 package com.sarwar.api;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -17,7 +20,7 @@ public class Controller {
 	
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-	public Paragraph showParagraph() {
+	public Paragraph showParagraph() throws Exception {
 		System.out.println("showParagraph");
 		return service.getParagraphContent();
 	}
@@ -25,7 +28,7 @@ public class Controller {
 	@POST
 	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-	public Boolean query(Query query) {
+	public Boolean query(Query query) throws IOException, ClassNotFoundException, SQLException {
 		return service.queryData(query);
 	}
 
