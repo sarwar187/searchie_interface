@@ -18,7 +18,17 @@ public class Paragraph {
     
     private String context_words;
     
-    public String getContext_words() {
+    private int input_count;
+    
+    public int getInput_count() {
+		return input_count;
+	}
+
+	public void setInput_count(int input_count) {
+		this.input_count = input_count;
+	}
+
+	public String getContext_words() {
 		return context_words;
 	}
 

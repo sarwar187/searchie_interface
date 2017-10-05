@@ -1,11 +1,8 @@
 package com.sarwar.api;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Random;
 
 /**
  * @author Z
@@ -24,11 +21,7 @@ public class Service {
 				"these words will be sent to a keyword-based search engine that will be used to retrieve the entities you are looking for. So, help it with keywords!!";
 		para.setInstructions(instructions);	
 		TestSQLiteDB testdb = new TestSQLiteDB();
-		para = testdb.selectAll();
-		if(para==null)
-			System.out.println("null");
-		else
-			System.out.println("non-null");
+		para = testdb.selectAll();		
 		return para;
 	}
 	
@@ -62,16 +55,17 @@ public class Service {
 		
 		//Writing this to sqlite database. First two params are paragraph id and paragraph title
 		String context_words = "";
-		for(int i=1; i<array.length; i++) {
+		for(int i=2; i<array.length; i++) {
 			context_words+=array[i] + "\t";
 		}
 		context_words = context_words.trim();
 		Paragraph paragraph = new Paragraph();
 		paragraph.setId(array[0]);
+		paragraph.setTitle(array[1]); //this is the passcode
 		paragraph.setContext_words(context_words);
 		TestSQLiteDB testdb = new TestSQLiteDB();
-		testdb.update(paragraph);
+	    boolean flag  = testdb.update(paragraph);
 		/* do your query with this array of query params */		
-		return true;
+		return flag;
 	}
 }
