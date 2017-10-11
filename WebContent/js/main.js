@@ -1,26 +1,58 @@
-// The root URL for the RESTful services
-//var rootURL = "http://localhost:8181/searchie_interface/rest/api";
-//var rootURL = "http://localhost:8080/searchie_interface/rest/api";
-//var rootURL = "https://aybpwofuza.localtunnel.me/searchie_interface/rest/api";
+var paragraphURL = "http://localhost:8181/searchie_interface/rest/api/paragraph";
+var accessURL = "http://localhost:8181/searchie_interface/rest/api/access";
+var queryURL = "http://localhost:8181/searchie_interface/rest/api/query";
 //var rootURL = "http://brooloo.cs.umass.edu:8080/searchie_interface/rest/api"
-var rootURL = "http://localhost:8181/searchie_interface/rest/api"
-//var rootURL = "http://brooloo.cs.umass.edu:8080/searchie_interface/rest/api"
-//var rootURL = "http://brooloo.cs.umass.edu:8080/searchie_interface/rest/api"
-// Retrieve paragraph when application starts
-//application start howar shathe shathe paragraph dekhailo. showParagraph() er definition ta niche likha ase. 
+//var paragraphURL = "http://brooloo.cs.umass.edu:8080/searchie_interface/rest/api/paragraph";
+//var accessURL = "http://brooloo.cs.umass.edu:8080/searchie_interface/rest/api/access";
+//var queryURL = "http://brooloo.cs.umass.edu:8080/searchie_interface/rest/api/query";
 
+	
+$('#passcode_id').val('');
 
-//showParagraph();	
+$('#myTags').tagit();
 
-var local_paragraph;
-$( document ).ready(function() {
-    showParagraph();
+$("#postBtn").on("click", function() {
+	var passcode = $('#passcode_id').val();
+	if (!passcode) {
+		refreshPage('Please enter passcode');
+	} 
+	$('#passcode_id').val('');
+	accessCheck(passcode);
 });
 
-// -------------------------------
-// Minimal
-// -------------------------------
-$('#myTags').tagit();
+function refreshPage(message) {
+	if (message) {
+		alert(message);
+	}
+	window.location.reload(false);
+}
+
+function accessCheck(passcode) {
+	console.log('accessCheck');
+	if (!passcode) {
+		refreshPage('Please enter passcode');
+	}
+	
+	$('#passcode_hidden_id').val(passcode);
+	
+	$.ajax({
+		type : 'POST',
+		contentType : 'application/json',
+		url : accessURL,
+		dataType : "json",
+		data : passcode,
+		success : function(data, textStatus, jqXHR) {
+			if (data) {
+				showParagraph(passcode);
+			} else {
+				refreshPage('Cannot recognize given passcode. Please enter a valid passcode.');
+			}
+		},
+		error : function(jqXHR, textStatus, errorThrown) {
+			refreshPage('Error while checking passcode: ' + textStatus);
+		}
+	});
+}
 
 // Trigger search when pressing 'Return' on search key input field
 $('#myTags').keypress(function(e) {
@@ -34,93 +66,86 @@ $('#myTags').keypress(function(e) {
 var form = document.getElementById("paragraph_form");
 
 document.getElementById("query").addEventListener("click", function () {
-	if(!document.getElementById("passcode").value)
-		alert('Please use the passcode');
-	else{
-		searchQuery();
-		LoadPage();
-	}
+  searchQuery();
 });
 
-function loadPage()
-{
-	//AJAX CALL TO POST 450, RETURN 450+ ID OF SENTANCE + COUNT
-	window.location.reload(true);
-	//$('#QUERY').click(function() {
-      //$(this).prop('disabled',true);
-    //}
-}
-//}
-//showParagraph() function ta successful hoile renderList() function ke call dibe. rootURL a showParagraph() function
-//ta ase, ebong oitar against a GET method ta ase. so type hoilo GET and dataType hoilo json. 
-function showParagraph() {
+function showParagraph(passcode) {
 	console.log('showParagraph');
+	if (!passcode) {
+		refreshPage('Invalid passcode. Please enter a valid passcode.');
+	}
 	$.ajax({
-		type : 'GET',
-		url : rootURL,
-		dataType : "json", // data type of response
-		success : renderList
+		type : 'POST',
+		contentType : 'application/json',
+		url : paragraphURL,
+		//dataType : "json", // data type of response
+		data : passcode,
+		success : function(data, textStatus, jqXHR) {
+			renderList(data);
+		},
+		error : function(jqXHR, textStatus, errorThrown) {
+			refreshPage('Error while fetching paragraph: ' + textStatus);
+		}
 	});
 }
-
 
 function searchQuery() {
 	console.log('searchQuery');
 	$.ajax({
 		type : 'POST',
 		contentType : 'application/json',
-		url : rootURL,
-		dataType : "json",
+		url : queryURL,
+		//dataType : "json",
 		data : prepareQuery(),
 		success : function(data, textStatus, jqXHR) {
-			if(data==false)
-				alert('Wrong passcode! You will not get a new sentence to tag until you give the right passcode!');
-			else 
-				alert('You gave your input. Thanks!!');
-			loadPage();
+			if (!data || !data.description) {
+				refreshPage('No pragraph content found. Please try again');
+			} else if (!data.passcode) {
+				refreshPage('No passcode found. Please try again.');
+			} else {
+				$('#myTags li:not(:last)').remove();
+			}
+			showParagraph(data.passcode);
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
-			alert('Query error: ' + textStatus);
+			refreshPage('Query error: ' + textStatus);
 		}
 	});
 }
 
 var paragraph_id;
-var paragraph_title;
-
 function renderList(data) {
 	// JAX-RS serializes an empty list as null, and a 'collection of one' as an
 	// object (not an 'array of one')
 	var list = data == null ? [] : (data instanceof Array ? data : [ data ]);
 	$.each(list, function(index, paragraph) {
-		paragraph_id = paragraph.id
-		paragraph_title = paragraph.title
-//		$('.normal').append(paragraph_id);
-//		$('.normal').append(paragraph_title);	
-//		alert("query params: [" + paragraph.title + "]");
-		$('.normal').append(paragraph.instructions);
-		$('.normal').lettering('words');
-		$('.clickable').append(paragraph.description);
+		if (!paragraph) {
+			refreshPage('Cannot fetch any paragraph. Please try again.');
+		}
+		if (!paragraph.passcode) {
+			refreshPage('Invalid request. Please enter passcode and start new query');
+		}
+		if (!paragraph.description) {
+			refreshPage('No paragraph content found. Please try again.');
+		}
+		if (paragraph.passcode != $("#passcode_hidden_id").val()) {
+			refreshPage('Invalid passcode. Please provide valid passcode and try again');
+		}
+		$('p.clickable').text(paragraph.description);
 		$('.clickable').lettering('words');
+		$('p.instructions').text(paragraph.instructions);
+		paragraph_id = paragraph.id;
 	});
-//	$.each(list, function(index, paragraph) {
-//		$.append(paragraph.description);
-//		$.lettering('words');
-//	});
-	
 }
 
 // Helper function to serialize all the form fields into a JSON string
 function prepareQuery() {
-	var passcode = document.getElementById("passcode").value;
-	var selections = [paragraph_id, passcode];
+	var selections = [paragraph_id];
 	$(".tagit-label").each(function() { selections.push($(this).text()) });
-	//selections.push(String(paragraph.id));
-	//selections.push(String(paragraph.title));	
 	var json_data = JSON.stringify({
-		"param": selections.join("\t")
+		"param": selections.join("\t"),
+		"passcode" : $('#passcode_hidden_id').val()
 	});
-	alert("query params: [" + json_data + "]");
 	
 	return json_data;
 }
@@ -132,7 +157,16 @@ $("#myTags").on("click", "span.text-icon", function() {
 var p = $('.clickable');
 p.css({ cursor: 'pointer' });
 
-p.on('click', function(e) {
+function getExistingTags() {
+    var listElement =document.getElementsByClassName("the-word-here");
+    var tempArray = [];
+    for(var i=0;i<listElement.length; i++){
+        tempArray.push(listElement[i].childNodes[0].data);
+    }
+    return tempArray;
+}
+
+/*p.on('click', function(e) {
     var range = window.getSelection() || document.getSelection() || document.selection.createRange();
     var word = $.trim(range.toString());
     
@@ -146,4 +180,56 @@ p.on('click', function(e) {
     
     e.stopPropagation();
     
+});*/
+
+/*p.on('click', function (e) {
+    var range = window.getSelection() || document.getSelection() || document.selection.createRange();
+    var word = $.trim(range.toString());
+    if (word != '') {
+        var words = getExistingTags();
+        words.push(word);
+        words.sort();
+        console.log(words);
+        $('#myTags').empty();
+        for(var i=0;i<words.length;i++){
+            var wordElm = '<li class="tagit-choice ui-widget-content ui-state-default ui-corner-all tagit-choice-editable"><span class="tagit-label the-word-here">' + words[i] + '</span><a class="tagit-close"><span class="text-icon">\xd7</span><span class="ui-icon ui-icon-close"></span></a><input value="' + words[i] + '" name="tags" class="tagit-hidden-field" type="hidden"></li>';
+            var targetChar = ' ';
+            var tkeyCode = targetChar.charCodeAt(0);
+
+            $('#myTags').trigger({type: 'keypress', which: tkeyCode, keyCode: tkeyCode}).prepend(wordElm);
+        }
+
+    }
+
+    e.stopPropagation();
+
+});*/
+
+
+p.on('click', function (e) {
+    var range = window.getSelection() || document.getSelection() || document.selection.createRange();
+    var word = $.trim(range.toString());
+    if (word != '') {
+        var words = getExistingTags();
+        words.push(word);
+        words.sort();
+        $('#myTags').empty();
+        var prevWord;
+        for (var i = 0; i < words.length; i++) {
+            var wordElm = '<span class="tagit-choice ui-widget-content ui-state-default ui-corner-all tagit-choice-editable">' +
+                '<button class="tagit-label the-word-here">' + words[i] + '</button><a class="tagit-close"><span class="text-icon">\xd7</span><span class="ui-icon ui-icon-close" style="cursor: pointer"></span></a><input value="' + words[i] + '" name="tags" class="tagit-hidden-field" type="hidden"></span>';
+            var targetChar = ' ';
+            var tkeyCode = targetChar.charCodeAt(0);
+            if (prevWord != words[i]) {
+                $('#myTags').prepend('<br/>');
+            }
+            $('#myTags').trigger({type: 'keypress', which: tkeyCode, keyCode: tkeyCode}).prepend(wordElm);
+
+            prevWord = words[i];
+        }
+
+    }
+
+    e.stopPropagation();
+
 });

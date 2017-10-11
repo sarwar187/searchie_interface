@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Paragraph {
 
-    private String id;
+    private Integer id;
 
     private String title;
 
@@ -17,6 +17,8 @@ public class Paragraph {
     private String instructions; 
     
     private String context_words;
+    
+    private String passcode;
     
     private int input_count;
     
@@ -44,11 +46,11 @@ public class Paragraph {
 		this.instructions = instructions;
 	}
 
-	public String getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -69,6 +71,16 @@ public class Paragraph {
 	}
 	
 	public String toString(){
-		return this.getId() + "\t" + this.getDescription() + "\t" + this.getTitle() + "\t" + this.getInstructions();
+		return this.passcode + "\t" + this.getId() + "\t" + this.getDescription() + "\t" + this.getTitle() + "\t" + this.getInstructions();
+	}
+
+	public void setPasscode(String passcode) {
+		// TODO Auto-generated method stub
+		this.passcode = passcode;
+		
+	}
+	
+	public String getPasscode() {
+		return this.passcode;
 	}
 }
